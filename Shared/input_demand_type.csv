@@ -1,0 +1,5 @@
+demand_type,demand_type_name,average_VOT,pricing_type,percentage_of_pretrip_info,percentage_of_enroute_info,percentage_of_vehicle_type1,percentage_of_vehicle_type2,percentage_of_vehicle_type3,percentage_of_vehicle_type4,percentage_of_vehicle_type5
+1,SOV,12,1,0,0,80,20,0,0,0
+2,HOV,12,2,0,0,80,20,0,0,0
+3,truck,60,3,0,0,0,0,30,30,40
+4,transit,60,4,0,0,0,0,0,0,0

@@ -1,0 +1,858 @@
+<?xml version="1.0"?>
+<doc>
+<assembly>
+	<name>CaliperForm</name>
+	<version>1.5.0.0</version>
+	<fullname>CaliperForm, Version=1.5.0.0, Culture=Invariant Language (Invariant Country), PublicKeyToken=System.Byte[]</fullname>
+</assembly>
+<members>
+<member name="T:CaliperForm.Connection">
+ <summary>
+ Connection class for Windows.Forms dekstop applications. Use this class to connect to the GISDK environment, execute functions and macros, 
+ create map images and select geographic data. This class include methods for converting data types between the GISDK environment
+ and the .NET environment. 
+ </summary>
+</member>
+<member name="P:CaliperForm.Connection.MappingServer">
+ <summary>
+ Mapping server name. Can be either "TransCAD" or "Maptitude" or "TransModeler"
+ </summary>
+ <returns></returns>
+</member>
+<member name="P:CaliperForm.Connection.CloseOnError">
+ <summary>
+ Automatically close the connection if a run-time exception is thrown (defaults to True).
+ </summary>
+ <returns>True if close the connection if a run-time exception is thrown</returns>
+</member>
+<member name="M:CaliperForm.Connection.Open">
+  <summary>
+  Open a connection to a mapping server. Always call this method before using the mapping server.
+  Returns true if connection is successful, false otherwise. 
+  </summary>
+ <returns>Returns true if connection to Maptitude, TransCAD or TransModeler is open, else return false. This method may raise
+ an exception of type "Unauthorized Access Exception" or "Access is Denied". To avoid an access exception,
+ you need to verify the security tab in the DCOM configuration settings for "TransCAD Automation Server (version 1.0)" or 
+ "Maptitude Automation Server (version 1.0)". The ASPNET account must have launch and access permission to
+ the TransCAD or the Maptitude DCOM server object.</returns>
+ <example>
+ <code>
+ 
+ Dim NumFilled As Integer = 0
+ Dim DataSet As New System.Data.DataSet("Gisdk")
+ Dim DataAdapter As CaliperForm.GisdkDataAdapter
+ Dim ViewFile As String
+ Dim ViewName As String
+ Dim MyTable As System.Data.DataTable
+ Dim Gisdk As CaliperForm.Connection
+ 
+ Gisdk = New CaliperForm.Connection()
+ Gisdk.MappingServer = "TransCAD" or:
+ Gisdk.MappingServer = "Maptitude" or:
+ Gisdk.MappingServer = "TransModeler"
+ Gisdk.Open()
+ ViewFile = Gisdk.MapPath("Tutorial/Customer.dbf")
+ If Not IsNothing(ViewFile) Then
+      ViewName = Gisdk.GetView(ViewFile)
+      DataAdapter = New GisdkDataAdapter(Gisdk, ViewName)
+      DataAdapter.TableName = "Customers"
+      DataAdapter.RowsPerFill = 10
+      While (DataAdapter.SetRows > 0) AndAlso (DataAdapter.RowsLeft > 0)
+          NumFilled = DataAdapter.Fill(DataSet)
+          DataAdapter.CurrentRow = DataAdapter.NextRow
+     End While
+ End If
+ Gisdk.Close()
+ 
+ </code>
+ </example>
+ 
+</member>
+<member name="M:CaliperForm.Connection.TableToArray(System.Collections.Hashtable)">
+ <summary>
+ Translate a Microsoft.NET Hashtable object or a CaliperForm.Collection object into an option array that can be passed as an argument to a Gisdk function or macro.
+ This method will translate nested hashtables or collections to a valid option array.
+ </summary>
+ <param name="Table">Input Hashtable or CaliperForm.Collection</param>
+ <returns>Output Gisdk option array with the format: { { "Key1" , value1 } , { "Key2" , value2 } , ... }</returns>
+</member>
+<member name="M:CaliperForm.Connection.GetSystemType(System.String)">
+ <summary>
+ Returns a valid Microsoft.NET System.type for a Gisdk type name. Supports string, double and integer types.
+ </summary>
+ <param name="GisdkTypeName">A Gisdk type name: "string", "integer", "real", "double", "float", "short" , or "long".</param>
+ <returns>A valid Microsoft.NET System.type: System.String, System.Int32, or System.Double.</returns>
+</member>
+<member name="M:CaliperForm.Connection.ArrayToTable(System.Object)">
+ <summary>
+ Translate a Gisdk option array into a valid Microsoft.NET hashtable. This method will not translate nested option array values to hashtables.
+ </summary>
+ <param name="ObjectArray">Input Gisdk option array with the format: { { "Key1" , value1 } , { "Key2" , value2 } , ... } </param>
+ <returns>A valid Microsoft.NET Hashtable object</returns>
+</member>
+<member name="M:CaliperForm.Connection.ObjectToArray(System.Object,System.String)">
+ <summary>
+ Translate a Gisdk array to a valid .NET array of the correct type
+ </summary>
+ <param name="GisdkArray">Input Gisdk array</param>
+ <param name="SystemType">Desired type of each array item: one of "integer" , "double" , "boolean" , or "string".</param>
+ <returns>The desired .NET array</returns>
+</member>
+<member name="M:CaliperForm.Connection.DoFunction(System.String,System.Object[])">
+ <summary>
+ Executes a GISDK function. For example: Gisdk.DoFunction("GetProgram") returns an array with the program information.
+ </summary>
+ <param name="FunctionName">Function name.</param>
+ <param name="Arguments">Optional input arguments. See the GISDK online manual for the list of functions and the required input arguments.</param>
+ <returns>The object returned by executing the function. This method throws an exception if the GISDK function returns an error.</returns>
+</member>
+<member name="M:CaliperForm.Connection.DoMacro(System.String,System.String,System.Object[])">
+ <summary>
+ Executes a GISDK macro in a compiled module (UIDatabase). 
+ </summary>
+ <param name="MacroName">Name of the macro in the UIDatabase</param>
+ <param name="UIDatabase">Compiled GISDK Module. Use a partial path to indicate a module in the Maptitude or TransCAD program directory.</param>
+ <param name="Arguments">Input arguments required by the macro.</param>
+ <returns>The object returned by the macro. This method throws an exception if a function called inside the macro returns an error.</returns>
+</member>
+<member name="M:CaliperForm.Connection.GetMap(System.String)">
+ <summary>
+ Open or get a map in the current workspace. If the map is already open, it returns its name, else it tries to open the map file. 
+ This method may return Nothing if the GISDK fails to open the map because some of the layers speficied in the map file cannot be found.
+ </summary>
+ <param name="MapFileName">Map file name. Can be a partial path, relative to the program folder or the application folder, or an absolute path.</param>
+ <returns>The name of the open map, or Nothing if the map cannot be open because one or more layers cannot be found.</returns>
+</member>
+<member name="M:CaliperForm.Connection.GetMap(System.String,System.String)">
+ <summary>
+ Open a map and set the map scope.
+ </summary>
+ <param name="MapFileName">Input map file</param>
+ <param name="ScopeString">Desired map scope</param>
+ <returns>The workspace map name if succesfull, else nothing</returns>
+</member>
+<member name="M:CaliperForm.Connection.StringToScope(System.String)">
+ <summary>
+ Translate a propertly formatted string into a valid GISDK scope object using the current map units.
+ </summary>
+ <param name="ScopeString">A string formatted as: "CenterLongitude|CenterLatitude|ScopeWidth|ScopeHeight". The decimal point in ScopeWidth and ScopeHeight must be indicated with a period, independently of the Windows regional settings.</param>
+ <returns>A valid GISDK scope object.</returns>
+</member>
+<member name="M:CaliperForm.Connection.ScopeToString(System.Object)">
+ <summary>
+ Translate a GISDK scope object into a string.
+ </summary>
+ <param name="ScopeObject">A valid GISDK scope object in the current map units.</param>
+ <returns>A string formatted as: "CenterLongitude|CenterLatitude|ScopeWidth|ScopeHeight".
+ CenterLongitude and CenterLatitude are integers (millions of degrees). ScopeWidth and ScopeHeight
+ are real. The decimal point in ScopeWidth and ScopeHeight is always indicated with a period, independently of the computer Windows regional settings.</returns>
+</member>
+<member name="M:CaliperForm.Connection.GetFieldTypes(System.String,System.Object)">
+ <summary>
+ Get the list of field specs and field types for a given list of field names.
+ If the input view name is mappable to a geographic layer, this method will search for all mappable fields, including all tables joined to the layer.
+ </summary>
+ <param name="ViewName">Input view name</param>
+ <param name="FieldNames">Array with list of field names</param>
+ <returns>Nothing if one or more of the input field names cannot be found. Else, it returns an array of arrays with format: { { FieldSpec , FieldType } }, where FieldSpec is a string of type "ViewName.FieldName" and FieldType is a valid Gisdk variant type name (string, integer, or double)</returns>
+</member>
+<member name="M:CaliperForm.Connection.GetLayer(System.String)">
+ <summary>
+ Get the name of a layer that is open in the workspace. The layer must already be in the workspace in one of the open maps.
+ </summary>
+ <param name="LayerName">Input layer name.</param>
+ <returns>The actual name of the layer found, e.g. "Layer Name", or "Layer Name:1", or "Layer Name:2", etc...</returns>
+</member>
+<member name="M:CaliperForm.Connection.GetLayer(System.String,System.String)">
+ <summary>
+ Get the name of a layer contained in a map. The map must be already open in the workspace.
+ </summary>
+ <param name="LayerName">Input layer name</param>
+ <param name="MapName">Input map name</param>
+ <returns>The actual name of the layer found, e.g. "Layer Name", or "Layer Name:1", or "Layer Name:2", etc...</returns>
+</member>
+<member name="M:CaliperForm.Connection.MapPath(System.String)">
+ <summary>
+ Map a partial file path to a full path, and checks that files exists, using
+ the search path specified in TransCAD or Maptitude under Edit Preferences - System - Search Path.
+ Returns the complete path of the file found, else returns nothing.
+ </summary>
+</member>
+<member name="M:CaliperForm.Connection.GetView(System.String,System.Boolean)">
+ <summary>
+ Open or get a table in the current workspace. If the table is already open, this method returns the name of the existing view. 
+ If the table is not open, this method will open the table file and add its view to the current workspace.
+ </summary>
+ <param name="ViewFileOrTableFile">Input dataview file (with extension .dvw) or binary table.</param>
+ <param name="ForWriting">Whether to open the table for writing. Defaults to False.</param>
+ <returns>The name of the corresponding view in the current workspace. Returns Nothing or thows an exception if the table cannot be open.</returns>
+</member>
+<member name="M:CaliperForm.Connection.SaveSchema(System.String,System.Object,System.String)">
+ <summary>
+ Save the XML schema of a data view to a file.
+ </summary>
+ <param name="ViewName">Input view name</param>
+ <param name="Fields">List of fields to include in the XML schema</param>
+ <param name="XMLFileName">Output XML File</param>
+ <returns>The number of records contained in the view.</returns>
+</member>
+<member name="M:CaliperForm.Connection.SaveDataSet(System.String,System.String,System.Object,System.String,System.Int32)">
+ <summary>
+ Save a selection set to an XML dataset file. The output file will contain the schema and the data. See also: GisdkDataAdapter.
+ </summary>
+ <param name="ViewName">Input view</param>
+ <param name="SetName">Input set</param>
+ <param name="Fields">List of columns to store to the XML dataset</param>
+ <param name="XMLFileName">Output XML file. If the file extension is xsd it will output the XML schema only.</param>
+ <param name="Verbose">If Verbose is greater than zero, this method will display progress status in the Gisdk environment while processing the data.</param>
+ <returns>The number of rows written to the output XML file. Returns -1 if a run-time exception occured.</returns>
+</member>
+<member name="M:CaliperForm.Connection.IsConnected">
+ <summary>
+ Returns true if we are connected to the mapping server.
+ </summary>
+</member>
+<member name="M:CaliperForm.Connection.Close">
+ <summary>
+ Close the connection to the GISDK mapping server object. Always call this method when done with the current connection.
+ </summary>
+</member>
+<member name="T:CaliperForm.Style">
+ <summary>
+ Default style types for annotations, points, lines, areas and themes.
+ </summary>
+</member>
+<member name="F:CaliperForm.Style.Color">
+ <summary>
+ Default style types for annotations, points, lines, areas and themes.
+ </summary>
+</member>
+<member name="F:CaliperForm.Style.LineStyle">
+ <summary>
+ Default style types for annotations, points, lines, areas and themes.
+ </summary>
+</member>
+<member name="F:CaliperForm.Style.FillStyle">
+ <summary>
+ Default style types for annotations, points, lines, areas and themes.
+ </summary>
+</member>
+<member name="F:CaliperForm.Style.ColorsPlay">
+ <summary>
+ Default style types for annotations, points, lines, areas and themes.
+ </summary>
+</member>
+<member name="F:CaliperForm.Style.FillsPlay">
+ <summary>
+ Default style types for annotations, points, lines, areas and themes.
+ </summary>
+</member>
+<member name="F:CaliperForm.Style.LinesPlay">
+ <summary>
+ Default style types for annotations, points, lines, areas and themes.
+ </summary>
+</member>
+<member name="F:CaliperForm.Style.QuantileFills">
+ <summary>
+ Default style types for annotations, points, lines, areas and themes.
+ </summary>
+</member>
+<member name="T:CaliperForm.ConnectionStatus">
+ <summary>
+ Data structure storing cumulative statistics about this mapping server.
+ Can be used to decide whether or not the mapping server is functioning properly, 
+ if it needs to be restarted, or whether we need to redirect to other, less busy mapping servers.
+ </summary>
+</member>
+<member name="M:CaliperForm.ConnectionStatus.ToString">
+ <summary>
+ Pretty print of this connection status. 
+ </summary>
+</member>
+<member name="M:CaliperForm.ConnectionStatus.ToXML">
+ <summary>
+ Pretty print of this connection status as an XML element.
+ </summary>
+</member>
+<member name="F:CaliperForm.ConnectionStatus.MaxQueueSize">
+ <summary>
+ Max number of concurrent connections
+ </summary>
+</member>
+<member name="F:CaliperForm.ConnectionStatus.MaxConnections">
+ <summary>
+ Number of attempted connections
+ </summary>
+</member>
+<member name="F:CaliperForm.ConnectionStatus.NumConnections">
+ <summary>
+ Number of successful connections
+ </summary>
+</member>
+<member name="F:CaliperForm.ConnectionStatus.MaxWaitSeconds">
+ <summary>
+ Maximum ellapsed time before connecting (in seconds)
+ </summary>
+</member>
+<member name="F:CaliperForm.ConnectionStatus.LastConnection">
+ <summary>
+ Status of the last attempted connection 
+ </summary>
+</member>
+<member name="F:CaliperForm.ConnectionStatus.LastWaitSeconds">
+ <summary>
+ Elapsed time for the last connection 
+ </summary>
+</member>
+<member name="F:CaliperForm.ConnectionStatus.LastQueueSize">
+ <summary>
+ Last queue size
+ </summary>
+</member>
+<member name="F:CaliperForm.ConnectionStatus.StartTime">
+ <summary>
+ Time we started to collect the connection statistics
+ </summary>
+</member>
+<member name="F:CaliperForm.ConnectionStatus.LastConnectionID">
+ <summary>
+ Last connection ID
+ </summary>
+</member>
+<member name="T:CaliperForm.MapParameters">
+ <summary>
+ Data structure storing map image attributes associated to PNG, BMP and JPEG files.
+ </summary>
+</member>
+<member name="F:CaliperForm.MapParameters.application">
+ <summary>
+ Name of the application that generated the map image.
+ </summary>
+</member>
+<member name="F:CaliperForm.MapParameters.file">
+ <summary>
+ PNG or JPEG map image file that this MapParameters describes.
+ </summary>
+</member>
+<member name="F:CaliperForm.MapParameters.scope">
+ <summary>
+ String encoding the map image scope: "CenterLongitude|CenterLatitude|ScopeWidth|ScopeHeight".
+ CenterLongitude and CenterLatitude are integers (millions of degrees). ScopeWidth and ScopeHeight
+ are real numbers, with the period (.) indicating the decimal place.
+ </summary>
+</member>
+<member name="F:CaliperForm.MapParameters.height">
+ <summary>
+ Map image height in pixels.
+ </summary>
+</member>
+<member name="F:CaliperForm.MapParameters.width">
+ <summary>
+ Map image width in pixels.
+ </summary>
+</member>
+<member name="F:CaliperForm.MapParameters.units">
+ <summary>
+ Map scope units (Miles, Kilometers, ...)
+ </summary>
+</member>
+<member name="F:CaliperForm.MapParameters.layer">
+ <summary>
+ Target layer name
+ </summary>
+</member>
+<member name="F:CaliperForm.MapParameters.field">
+ <summary>
+ Target field name
+ </summary>
+</member>
+<member name="F:CaliperForm.MapParameters.value">
+ <summary>
+ Target field value
+ </summary>
+</member>
+<member name="F:CaliperForm.MapParameters.corners">
+ <summary>
+ String encoding the four longitude/latitude coordinates at the corners of the map image.
+ </summary>
+</member>
+<member name="F:CaliperForm.MapParameters.projParams">
+ <summary>
+ Parameters for the projection used to produce the map image.
+ </summary>
+</member>
+<member name="F:CaliperForm.MapParameters.projName">
+ <summary>
+ Name of the projection used to produce the map image.
+ </summary>
+</member>
+<member name="F:CaliperForm.MapParameters.copyright">
+ <summary>
+ Copyright and date created information about this map image.
+ </summary>
+</member>
+<member name="M:CaliperForm.MapParameters.#ctor">
+ <summary>
+ Default constructor
+ </summary>
+</member>
+<member name="M:CaliperForm.MapParameters.#ctor(System.String)">
+ <summary>
+ Create an instance of MapParameters with data read from an XML file.
+ </summary>
+ <param name="XMLFileName">Input XML file name</param>
+</member>
+<member name="M:CaliperForm.MapParameters.Deserialize(System.String)">
+ <summary>
+ Reads the map attributes from an XML file.
+ </summary>
+</member>
+<member name="M:CaliperForm.MapParameters.Serialize(System.String)">
+ <summary>
+ Writes the map attributes to an XML file.
+ </summary>
+</member>
+<member name="T:CaliperForm.GisdkDataAdapter">
+ <summary>
+ Class for mapping GISDK dataviews and selection sets to ADO.NET datatables.
+ The class includes type-safe methods for filling a datatable schema and data with values coming from 
+ a GISDK view or selection set, methods for updating a GISDK dataview with values coming from a datatable,
+ and methods for aggregating and transposing datatables.
+ This class implements the IDataAdapter interface, and allows you to use TransCAD and Maptitude as data sources
+ in the same way you would use an SQL or an OLEDB data source.
+ </summary>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.ViewName">
+ <summary>
+ Data source view name
+ </summary>
+ <returns>Name of the data source view</returns>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.SetName">
+ <summary>
+ Data source selection set name. Can be set to nothing, in which case the entire view is mapped to a data table.
+ The selection set must already exist in the current workspace to be mapped to a data table.
+ </summary>
+ <returns>Name of the data source set</returns>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.TableName">
+ <summary>
+ Name of the dataset table.
+ </summary>
+ <returns></returns>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.ViewFieldNames">
+ <summary>
+ List of input field names in the data source view.
+ </summary>
+ <returns>Array of strings</returns>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.ViewFieldTypes">
+ <summary>
+ Returns an array with information about the field specs and field types stored in the input dataview.
+ This property is not null only after a Fill() or an Update() method is called at least once.
+ </summary>
+ <returns>An array of arrays with one entry for each field in ViewFieldNames. The format for each entry is: { "FieldSpec" , "FieldType" }, where "FieldSpec" is of type: "ViewName.FieldName" and "FieldType" is a valid Gisdk column type ("string", "double", or "integer"). </returns>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.ColumnNames">
+ <summary>
+ List of output dataset table column names to be mapped to the input data source fields.
+ Defaults to the same field names used in the data source.
+ </summary>
+ <returns>Array of strings</returns>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.RowsPerFill">
+ <summary>
+ Number of rows to be read at once per Fill() method call. Must be an integer number between 1 and 500. You can call the Fill() method multiple times to fill
+ a table with more than 500 rows.
+ </summary>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.CurrentRow">
+ <summary>
+ First row to be read by the Fill() method. Defaults to GisdkDataAdapter.FirstRow.
+ </summary>
+ <returns>A string representing a row handle in the source data view</returns>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.CaseSensitive">
+ <summary>
+ Indicates whether string comparisons within the table are case-sensitive. Defaults to false.
+ </summary>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.AllowDBNull">
+ <summary>
+ Indicates whether null values are allowed for rows belonging to the table. Defaults to true.
+ </summary>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.Unique">
+ <summary>
+ Indicates whether the values in each row must be unique, other than the unique field values. Defaults to False.
+ </summary>
+ <returns></returns>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.UniqueField">
+ <summary>
+ Field in the source data view that uniquely identifies each row. This property must be set if you want to use the Update() method
+ to match individual rows in the source data view to individual rows in the data table. If the view is a geographic layer (DBD), this field
+ must be the another field than the field called 'ID', because the 'ID' values are generated internally by the GISDK. 
+ </summary>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.SortField">
+ <summary>
+ Field in the source data view used to retrieve rows with the Fill() method. Defaults to Nothing, unless the GisdkDataAdapter is created with a sort expression.
+ </summary>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.SortOrder">
+ <summary>
+ Sort order in the source data view used to retrieve rows with the Fill() method. Defaults to Nothing, unless the GisdkDataAdapter is created with a sort expression.
+ </summary>
+ <returns>'Ascending' or 'Descending'</returns>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.IsReadOnly">
+ <summary>
+ Gets or sets a value indicating whether the data table allows changes once a row has been added to the table.
+ </summary>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.MaxLength">
+ <summary>
+ Gets or sets the maximum length of a text column. Defaults to -1 (no limits).
+ </summary>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.XMLMapping">
+ <summary>
+ Specifies how a data table column is serialized to XML. Defaults to System.Data.MappingType.Attribute.
+ </summary>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.FirstRow">
+ <summary>
+ Points to the first row in the input data source view selection set.
+ </summary>
+ <returns></returns>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.RowsLeft">
+ <summary>
+ Number of rows left to be read with the Fill() method.
+ </summary>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.NextRow">
+ <summary>
+ Row located immediately after the last row read by the Fill() method call. 
+ Can be used to set the current row before calling Fill() again.
+ </summary>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.SetRows">
+ <summary>
+ Indicates the total number of rows in the selection set mapped by this GisdkDataAdapter.
+ </summary>
+</member>
+<member name="M:CaliperForm.GisdkDataAdapter.#ctor(CaliperForm.Connection,System.String,System.String,System.String)">
+ <summary>
+ Create an instance of a GisdkDataAdapter that maps a GISDK data source view to a dataset table.
+ </summary>
+ <param name="SourceConnection">A live CaliperForm.Connection. The connection must be open before the GisdkDataAdapter is used, and it can be closed after you release the GisdkDataAdapter.</param>
+ <param name="SourceViewName">The name of an existing view in the GISDK workspace</param>
+ <param name="SourceSetName">Optional name of existing selection set in the source data view. Defaults to nothing.</param>
+ <param name="SortExpression">Optional sort expression that specifies how rows are retrieved with the Fill() method.  The format is: "FieldName ASC" or "FieldName DESC". Defaults to nothing to indicate natural sort order.</param>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.MissingMappingAction">
+ <summary>
+ Action to take when incoming data in ViewName does not have a matching table or column. Always return MissingMappingAction.Error.
+ </summary>
+ <returns>MissingMappingAction.Error</returns>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.MissingSchemaAction">
+ <summary>
+ Action to take when existing DataSet TableName schema does not match incoming data in ViewName. Always return MissingSchemaAction.Error.
+ </summary>
+ <returns>MissingSchemaAction.Error</returns>
+</member>
+<member name="P:CaliperForm.GisdkDataAdapter.TableMappings">
+ <summary>
+ Returns a TableMappings collection that maps TableName to ViewName and ColumnNames to ViewFieldNames
+ </summary>
+</member>
+<member name="M:CaliperForm.GisdkDataAdapter.GetFillParameters">
+ <summary>
+ Gets the parameters set by the user when executing a Fill() or Update() method. Not used.
+ </summary>
+ <returns>Nothing</returns>
+</member>
+<member name="M:CaliperForm.GisdkDataAdapter.FillSchema(System.Data.DataSet,System.Data.SchemaType)">
+ <summary>
+ Adds a datatable to the specified dataset and configures the schema of the table to match that in the
+ data source specified in the properties of this data adapter.
+ The input schemaType argument is ignored. The table schema is always inferred from the source view in the GISDK workspace.
+ </summary>
+</member>
+<member name="M:CaliperForm.GisdkDataAdapter.Transpose(System.Data.DataTable,System.String,System.String,System.String,System.Object[])">
+ <summary>
+ Creates a new datatable that transposes rows and columns of the input datatable.
+ </summary>
+ <param name="InputTable">The input datatable with one row per record and one column per field</param>
+ <param name="OutputTableName">Output datatable name. Defaults to "Table"</param>
+ <param name="OutputFieldColumnName">Output field column name. This will be the name of the first column. Defaults to "Fields"</param>
+ <param name="OutputColumnName">Output column name prefix. The output columns will be named "ColumnName 1", "ColumnName 2", etc. Defaults to "Record"</param>
+ <param name="OutputColumnFormats">Optional custom string format for each output column (e.g., "{0:c}" for currency). Default to Nothing.</param>
+ <returns>A datatable with one row per field and one column per record in the input table. All of the output values are cast to strings.</returns>
+</member>
+<member name="M:CaliperForm.GisdkDataAdapter.Transfer(System.Data.DataSet,System.String,System.String)">
+ <summary>
+ Creates or restores a selection set ViewName|SetName with the rows corresponding to the rows in the input data table.
+ </summary>
+ <param name="DataSetObject">Input data set storing the datatable to transfer.</param>
+ <param name="Operation">Set operation. One of: several, more, less and subset. Defaults to "several".</param>
+ <param name="UniqueColumn">Column in the input table that corresponds to the UniqueField in the output Gisdk view. Defaults to UniqueField.</param>
+ <returns>The number of records in the output selection set.</returns>
+</member>
+<member name="M:CaliperForm.GisdkDataAdapter.Aggregate(System.Data.DataTable,System.String,System.String[])">
+ <summary>
+ Creates a new table with the aggregates (sums and counts) for selected numeric columns in the input table.
+ </summary>
+ <param name="InputTable">Input table to aggregate</param>
+ <param name="OutputTableName">Output table name</param>
+ <param name="ColumnsToAdd">Input columns to add</param>
+ <returns>A new table with two rows. The first row contains the totals, and the second row contains the count of the non-zero values for each column.</returns>
+</member>
+<member name="M:CaliperForm.GisdkDataAdapter.Update(System.Data.DataSet)">
+ <summary>
+ Updates a view in the Gisdk workspace based on the values stored in the changed rows of a datatable. 
+ Each row will be added, updated or deleted from the Gisdk view based on the value stored in the datarow.rowstate property.
+ Returns the number of rows affected = rows added + rows updated + rows deleted.
+ </summary>
+</member>
+<member name="M:CaliperForm.GisdkDataAdapter.Fill(System.Data.DataSet)">
+ <summary>
+ Add rows from a Gisdk selection set to an ADO.NET system.data.datatable object.
+ If the table does not exist in the input DataSetObject, it will be created.
+ If the table already exists, the rows will be added to it.
+ Returns the number of rows stored in the table. As a side effect, it 
+ may set the properties for RowsLeft, NextRow and CurrentRow to indicate the records
+ that can be read by the next call to Fill().
+ </summary>
+ <example>
+ <code>
+ Dim Gisdk As New CaliperForm.Connection()
+ Dim NumFilled As Integer = 0
+ Dim DataSet As New DataSet("Customer Data Set")
+ Gisdk.MappingServer = "Maptitude" or "TransCAD" or "TransModeler"
+ Gisdk.Open()
+ Dim ViewName As String = Gisdk.GetView("Tutorial/Customer.dbf")
+ Dim DataAdapter As New GisdkDataAdapter(Gisdk,ViewName)
+ DataAdapter.TableName = "Customer Table"
+ DataAdapter.RowsPerFill = 10
+ While (DataAdapter.SetRows > 0) AndAlso (DataAdapter.RowsLeft > 0)
+      NumFilled = DataAdapter.Fill(DataSet)
+      DataAdapter.CurrentRow = DataAdapter.NextRow
+ End While
+ Gisdk.Close()
+ </code>
+ </example>
+</member>
+<member name="M:CaliperForm.GisdkDataAdapter.Fill(System.Data.DataSet,System.String,System.String,System.String,System.Object)">
+ <summary>
+ Add rows from a Gisdk selection set to an ADO.NET system.data.datatable object. This
+ version of Fill() will add a column of distances from a coordinate. 
+ The caller can then sort the output datatable using the Distance column. 
+ </summary>
+ <param name="DataSetObject">Dataset to fill</param>
+ <param name="LongitudeField">Name of the longitude field in the input view</param>
+ <param name="LatitudeField">Name of the latitude field in the input view</param>
+ <param name="DistanceColumn">Distance column in the output table</param>
+ <param name="CoordObject">Input coordinate object</param>
+ <returns></returns>
+</member>
+<member name="M:CaliperForm.GisdkDataAdapter.Fill(System.Data.DataSet,System.String,System.String)">
+ <summary>
+ Add rows from a Gisdk selection set to an ADO.NET system.data.datatable object. This
+ version of Fill() will fill a string column with the geographic scope for each row. The input
+ view must be mappable to a geographic layer (a point, a line or an area layer).
+ </summary>
+ <param name="DataSetObject">Dataset to fill</param>
+ <param name="IDFieldName">Input view ID field name storing the unique row handle for each feature (it's usually "ID").</param>
+ <param name="ScopeColumnName">Output scope column name. The scopes are encoded as "CenterLongitude|CenterLatitude|Width(in current map units)|Height(in current map units)"</param>
+ <returns>The number of rows filled</returns>
+</member>
+<member name="T:CaliperForm.Counter">
+ <summary>
+ Counter class for Windows.Forms desktop applications.
+ </summary>
+</member>
+<member name="M:CaliperForm.Counter.GetCounter(System.String,System.Int32)">
+ <summary>
+ Ceate a new counter by name
+ </summary>
+ <param name="UniqueCounterName">globally unique counter name</param>
+ <param name="CounterSize">maximum value that can be stored in this counter</param>
+</member>
+<member name="M:CaliperForm.Counter.GetNextValue">
+ <summary>
+ Get the next value for this counter. Loops between 1 and the size of this counter
+ </summary>
+</member>
+<member name="M:CaliperForm.Counter.GetValue">
+ <summary>
+ Get the current value for this counter.
+ </summary>
+ <returns>A value between 0 and size -1 </returns>
+</member>
+<member name="M:CaliperForm.Counter.Reset">
+ <summary>
+ Get the next value and reset the counter to zero
+ </summary>
+</member>
+<member name="T:CaliperForm.Tickets">
+ <summary>
+ Tickets class for Windows.Forms desktop applications.
+ </summary>
+</member>
+<member name="M:CaliperForm.Tickets.GetTickets(System.String)">
+ <summary>
+ Get a handle of a Ticket queue by name. Returns true.
+ <example>
+ <code>
+ Dim X As Tickets
+ X = New Tickets()
+ X.GetTickets("Ticket List Name")
+ </code>
+ </example>
+ </summary>
+</member>
+<member name="M:CaliperForm.Tickets.IsSynchronized">
+ <summary>
+ Returns True. Indicates that Caliper.Web.Tickets are thread-safe
+ </summary>
+</member>
+<member name="M:CaliperForm.Tickets.GetTicket">
+ <summary>
+ Creates and add a new Ticket to the list, returns its value
+ </summary>
+</member>
+<member name="M:CaliperForm.Tickets.Add(CaliperForm.Ticket)">
+ <summary>
+ Add a specific new Ticket at the end of the list, returns its position in the list
+ </summary>
+</member>
+<member name="M:CaliperForm.Tickets.Remove(CaliperForm.Ticket)">
+ <summary>
+ Remove an existing Ticket from the list. Returns its position. Returns -1 if not found.
+ </summary>
+</member>
+<member name="M:CaliperForm.Tickets.IndexOf(CaliperForm.Ticket)">
+ <summary>
+ Get position of Ticket in list. Returns -1 if not found.
+ </summary>
+</member>
+<member name="M:CaliperForm.Tickets.GetValue(System.Int32)">
+ <summary>
+ Returns the Ticket located at a specific index in the list.
+ Returns an empty Ticket if Index is more than the list count.
+ </summary>
+</member>
+<member name="M:CaliperForm.Tickets.SetValue(System.Int32,CaliperForm.Ticket)">
+ <summary>
+ Set an existing Ticket to a new value, and returns 
+ what was the old Ticket stored in the same position. 
+ The Ticket will be replaced if Index is less than the current list count.
+ </summary>
+</member>
+<member name="M:CaliperForm.Tickets.Count">
+ <summary>
+ Returns the number of tickets in the list.
+ </summary>
+</member>
+<member name="M:CaliperForm.Tickets.First">
+ <summary>
+ Returns the first Ticket in the list
+ </summary>
+</member>
+<member name="M:CaliperForm.Tickets.ToArray">
+ <summary>
+ Returns an array list copy of the list
+ </summary>
+</member>
+<member name="M:CaliperForm.Tickets.Describe">
+ <summary>
+ Returns a string representation of this list
+ </summary>
+</member>
+<member name="M:CaliperForm.Tickets.ToXML">
+ <summary>
+ Returns an XML string representation of this list.
+ </summary>
+</member>
+<member name="M:CaliperForm.Tickets.Refresh(CaliperForm.Ticket)">
+ <summary>
+ Refresh the timestamp for a Ticket. Returns the new Ticket value with a new timestamp
+ and the same ID.
+ </summary>
+</member>
+<member name="M:CaliperForm.Tickets.ClearAll">
+ <summary>
+ Remove all elements from the list and resets the list ID counter to zero.
+ Returns an array of tickets that is a copy of the removed list.
+ </summary>
+</member>
+<member name="M:CaliperForm.Tickets.Clear(System.Double)">
+ <summary>
+ Remove all elements for which the timestamp is older than now - interval
+ Returns an array copy of the tickets. The non-null tickets of the array are 
+ the ones that have been removed from the list. If no Ticket can be removed,
+ this method will return Nothing.
+ </summary>
+</member>
+<member name="T:CaliperForm.Ticket">
+ <summary> 
+ Data structure that stores unique IDs and timestamps.
+ </summary>
+</member>
+<member name="F:CaliperForm.Ticket.ID">
+ <summary>
+ Unique ID for this Ticket
+ </summary>
+</member>
+<member name="F:CaliperForm.Ticket.TimeStamp">
+ <summary>
+ Time-stamp that specifies when this Ticket was issued.
+ </summary>
+</member>
+<member name="M:CaliperForm.Ticket.SetTicket(System.Int32,System.Double)">
+ <summary>
+ Creates a new Ticket structure (value type) with an ID (System.Int32) and a TimeStamp (double).
+ You can access the structure fields with the dot notation:
+ <example>
+ <code>
+ Dim X As Ticket
+ Dim Y As Ticket
+ Y = New Ticket()
+ X.ID = Y.ID
+ X.TimeStamp = Y.TimeStamp
+ </code>
+ </example>
+ </summary>
+</member>
+<member name="M:CaliperForm.Ticket.TimeDifference(CaliperForm.Ticket,CaliperForm.Ticket)">
+ <summary>
+ Returns the timestamp difference between Ticket1 and Ticket2, assuming Ticket2 comes AFTER Ticket1
+ </summary>
+</member>
+<member name="M:CaliperForm.Ticket.ToXML">
+ <summary>
+ Returns an XML string representation of this Ticket with ID and TimeStamp attributes.
+ </summary>
+</member>
+<member name="M:CaliperForm.Ticket.Describe">
+ <summary>
+ Returns a string representation of this Ticket with ID and TimeStamp attributes.
+ </summary>
+</member>
+<member name="M:CaliperForm.Ticket.CompareTo(System.Object)">
+ <summary>
+ Returns:
+
+ Less than zero - This instance is less than other obj. 
+ Zero - This instance is equal to other obj. 
+ Greater than zero - This instance is greater than other obj.
+ </summary>
+</member>
+
+</members>
+</doc>

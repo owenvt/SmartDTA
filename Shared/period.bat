@@ -1,0 +1,1 @@
+c:\DTALite-NEXTA\DTALite.exe AM.tnp

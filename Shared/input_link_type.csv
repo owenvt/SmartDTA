@@ -1,0 +1,12 @@
+link_type,link_type_name,type_code,default_lane_capacity,default_speed_limit,default_number_of_lanes,capacity_adjustment_factor,travel_time_bias_factor,approximate_cycle_length_in_second,saturation_flow_rate_in_vhc_per_hour_per_lane
+1,freeway,f,1600,65,2,1,1,0,1600
+2,freeway,f,1600,65,2,1,1,0,1600
+3,major arterial,a,800,40,2,1,1,0,800
+4,minor arterial,a,700,35,2,1,1,0,700
+5,collector,a,600,30,2,1,1,0,600
+6,collector,a,600,30,2,1,1,0,600
+7,collector,a,600,30,2,1,1,0,600
+8,ramp,r,800,30,2,1,1,0,800
+9,centroid connector,c,2000,30,2,1,1,0,2000
+10,centroid connector,c,2000,30,2,1,1,0,2000
+11,major arterial,a,800,40,2,1,1,0,800
