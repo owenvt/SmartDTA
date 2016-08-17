@@ -35,4 +35,10 @@ Add another time period, or select all time perids you want to run, then click e
 
 There should now be a file called "load.csv" in your base project folder.  This may be opened in TransCAD and contains the model outputs.
 
+# Notes
+
 If there is a problem on any step, go back and make sure all prior boxes are selected before continuing.
+
+If there is an issue with "smartdta.dbd" try recompiling it.  It is simply a compiled version of "export network.rsc" which is included.
+
+SmartDTA.jar is the compiled java source code which is inlcuded.  It is used for converting csvs back and forth between TransCAD and DTALite formats.
