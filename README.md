@@ -13,4 +13,24 @@ NEXTA DTALite which is free and can be downloaded at https://github.com/xzhou99/
 IronPython which is free and can be downloaded at http://ironpython.net/
 
 # Usage
-Unzip the folder in your desired directory.  Run SmartDTA.py with IronPython.
+Unzip the folder in your desired directory.
+
+Find the file "input_link_type.csv" in the "Shared" folder.  This file will be copied to each of your time period folders, so modify it to match the link types to the numbers specified in your model documentation.  This file may be modified in each of the time period folders as well, once they are created.
+
+Run SmartDTA.py with IronPython.
+
+Browse to select your project folder.  This is the base directory that contains your time period folders.
+
+Add a time period and give it a name.
+
+Find your network file that contains the links and nodes for the street network and export it.
+
+Select the correct fields from the network.  If the fields are named something different for the BA direction, check the "more fields" box and select them.
+
+Browse for the trips matrix and pick a core to match your time period.  Do the same with trucks (this may or may not be in the same matrix)
+
+Select your peak hour factor.
+
+Add another time period, or select all time perids you want to run, then click each of the buttons in the bottom right, "Run Java," "Run DTA," and "Write Load."  Give each time to complete.
+
+There should now be a file called "load.csv" in your base project folder.  This may be opened in TransCAD and contains the model outputs.
