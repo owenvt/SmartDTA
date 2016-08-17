@@ -22,7 +22,6 @@ import CaliperForm
 import subprocess
 from subprocess import call
 import shutil
-from time import sleep
 
 class AddTimePeriod(Form):
 
