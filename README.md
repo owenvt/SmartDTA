@@ -34,3 +34,5 @@ Select your peak hour factor.
 Add another time period, or select all time perids you want to run, then click each of the buttons in the bottom right, "Run Java," "Run DTA," and "Write Load."  Give each time to complete.
 
 There should now be a file called "load.csv" in your base project folder.  This may be opened in TransCAD and contains the model outputs.
+
+If there is a problem on any step, go back and make sure all prior boxes are selected before continuing.
