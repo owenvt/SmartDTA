@@ -3,9 +3,13 @@ This software is released under GNU GPLv3.  It is intended to simplify the proce
 
 # Installation
 Save all files to a folder on your computer.  In addition to SmartDTA, you will need:
+
 TransCAD version 6
+
 Java
+
 NEXTA DTALite which is free and can be downloaded at https://github.com/xzhou99/dtalite_software_release
+
 IronPython which is free and can be downloaded at http://ironpython.net/
 
 # Usage
