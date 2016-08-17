@@ -1,4 +1,4 @@
-# SmartDTA
+# SmartDTA Release 8-16-2016
 This software is released under GNU GPLv3.  It is intended to simplify the process of converting TransCAD static traffic models for use with NEXTA DTALite and dynamic traffic assignment, and return the outputs for viewing inside TrasCAD.
 
 # Installation
