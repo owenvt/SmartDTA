@@ -22,6 +22,7 @@ import CaliperForm
 import subprocess
 from subprocess import call
 import shutil
+from time import sleep
 
 class AddTimePeriod(Form):
 
@@ -254,15 +255,16 @@ class SmartDTA(Form):
         self.export_network_button.Text = "Export"
         self.export_network_button.Location = Point(280, 250)
         self.export_network_button.Size = Size(70, 20)
-        self.export_network_button.Click += self.Export_Network
         self.export_network_button.Click += self.OnChanged
+
+        self.export_network_button.Click += self.Export_Network
 
         self.export_matrix_button = Button()
         self.export_matrix_button.Text = "Export"
         self.export_matrix_button.Location = Point(280, 500)
         self.export_matrix_button.Size = Size(70, 20)
-        self.export_matrix_button.Click += self.Export_Matrix
         self.export_matrix_button.Click += self.OnChanged
+        self.export_matrix_button.Click += self.Export_Matrix
 
         self.truckFileLabel = Label()
         self.truckFileLabel.Text = "Trucks Table"
@@ -293,8 +295,8 @@ class SmartDTA(Form):
         self.export_truck_button.Text = "Export"
         self.export_truck_button.Location = Point(280, 550)
         self.export_truck_button.Size = Size(70, 20)
-        self.export_truck_button.Click += self.Export_Trucks
         self.export_truck_button.Click += self.OnChanged
+        self.export_truck_button.Click += self.Export_Trucks
 
         self.run_java_button = Button()
         self.run_java_button.Text = "Run Java"
@@ -307,15 +309,15 @@ class SmartDTA(Form):
         self.run_dta_button.Text = "Run DTA"
         self.run_dta_button.Location = Point(380, 530)
         self.run_dta_button.Size = Size(70, 20)
-        self.run_dta_button.Click += self.run_dta_lite
         self.run_dta_button.Click += self.OnChanged
+        self.run_dta_button.Click += self.run_dta_lite
 
         self.write_load_button = Button()
         self.write_load_button.Text = "Write Load"
         self.write_load_button.Location = Point(380, 550)
         self.write_load_button.Size = Size(70, 20)
-        self.write_load_button.Click += self.write_load_to_transcad
         self.write_load_button.Click += self.OnChanged
+        self.write_load_button.Click += self.write_load_to_transcad
 
         self.opperationLabel = Label()
         self.opperationLabel.Location = Point(380, 460)
@@ -504,6 +506,8 @@ class SmartDTA(Form):
             self.select_Pname.Items.Add(rdr.GetString(0))
 
     def update_database(self, cn, text, field):
+        if self.previousValue == "null":
+            self.previousValue = self.listBox.SelectedItem  #if there was no previous item, it was the current one.
         sql = (
             "update TimePeriods set " + field + "='" + text
             + "' where T_Name='"+ self.previousValue + "';"
@@ -538,16 +542,16 @@ class SmartDTA(Form):
         return return_text
 
     def OnChanged(self, sender, args):
-    	self.check_time_period_folder(self.listBox.SelectedItem)
+        self.check_time_period_folder(self.listBox.SelectedItem)
         cn = SqlCeConnection(self.connectionString)
         cn.Open()
 
-        if self.select_Pname.Text != None:
-        	sql = "delete from Projects where P_Folder='" + str(self.select_Pname.Text) + "';"
-       		#print sql
-        	cmd = SqlCeCommand(sql, cn)
-        	rdr = cmd.ExecuteNonQuery()
+        sql = "delete from Projects where P_Folder='" + str(self.select_Pname.Text) + "';"
+        #print sql
+        cmd = SqlCeCommand(sql, cn)
+        rdr = cmd.ExecuteNonQuery()
 
+        if self.select_Pname.Text != None:
         	sql = "insert into Projects values ('" + str(self.select_Pname.Text) + "');"
        		#print sql
         	cmd = SqlCeCommand(sql, cn)
@@ -594,7 +598,7 @@ class SmartDTA(Form):
         self.capacityBox2.Text = self.update_box(cn, self.capacityBox2.Text, "Capacity2")
         self.matrixFileBox.Text = self.update_box(cn, self.matrixFileBox.Text, "Matrix_File")
         self.coreBox.Text = self.update_box(cn, self.coreBox.Text, "Matrix_Core")
-        self.truckFileBox.Text = self.update_box(cn, self.matrixFileBox.Text, "Trucks_File")
+        self.truckFileBox.Text = self.update_box(cn, self.truckFileBox.Text, "Trucks_File")
         self.coreTBox.Text = self.update_box(cn, self.coreTBox.Text, "Trucks_Core")
         self.PHFBox.Text = self.update_box(cn, self.PHFBox.Text, "PHF")
 
@@ -868,7 +872,7 @@ class SmartDTA(Form):
 
     def copy_shared_files(self, target_directory,target_name):
     	print "copying shared files"
-    	base_path = self.select_Pname.Text
+    	base_path = os.getcwd()
     	shared_folder = "Shared"
     	tnp_file = "period.tnp"
     	#bat_file = "period.bat"
@@ -927,9 +931,9 @@ class SmartDTA(Form):
 
     	for item in self.listBox.SelectedItems:
 	    	self.generate_link_template(item)
-	    	cmd = 'java -cp "SmartDTA.jar" "SmartDTA_CC.Read_TransCAD_trip_tables_LR" "'+project_folder+ "\\" + item +'" Trips.csv TruckTrips.csv '
+	    	cmd = 'java -cp "SmartDTAJava.jar" "smartdtajava.Read_TransCAD_trip_tables" "'+project_folder+ "\\" + item +'" Trips.csv TruckTrips.csv '
 	    	subprocess.call(cmd)
-	    	cmd = 'java -cp "SmartDTA.jar" "SmartDTA_CC.Read_TransCAD_network_LR" "'+project_folder+ "\\" + item +'\\\\"'
+	    	cmd = 'java -cp "SmartDTAJava.jar" "smartdtajava.Read_TransCAD_network" "'+project_folder+ "\\" + item +'\\\\"'
 	    	subprocess.call(cmd)
     
     	self.opperationLabel.Visible = False
@@ -964,7 +968,7 @@ class SmartDTA(Form):
             phfs.append(self.query(cn, item, "PHF"))
             time_periods.append(item)
 
-        cmd = 'java -cp "SmartDTA.jar" "SmartDTA_CC.Write_Load_to_TransCAD_LR" "'+project_folder+ '\\\\" "' + str(time_periods) + '" "' + str(phfs) + '"'
+        cmd = 'java -cp "SmartDTAJava.jar" "smartdtajava.Write_Load_to_TransCAD" "'+project_folder+ '\\\\" "' + str(time_periods) + '" "' + str(phfs) + '"'
         print cmd
         subprocess.call(cmd)
 
