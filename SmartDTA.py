@@ -56,8 +56,8 @@ class AddTimePeriod(Form):
 
         sql = (
             "insert into TimePeriods(T_Name, Network_File, Speed, Speed2, Lanes, Lanes2,"
-            + "Functional_Class, Functional_Class2, Capacity, Capacity2, Matrix_File, Matrix_Core, Direction, Trucks_File, Trucks_Core, PHF) values ('"
-            + self.nameBox.Text + "','','','','','','','','','','','','','','','');"
+            + "Functional_Class, Functional_Class2, Matrix_File, Matrix_Core, Direction, Trucks_File, Trucks_Core, PHF) values ('"
+            + self.nameBox.Text + "','','','','','','','','','','','','','');"
             )
         cmd = SqlCeCommand(sql, cn)
         cmd.ExecuteNonQuery()
@@ -205,26 +205,6 @@ class SmartDTA(Form):
         self.functionalClassBox2.Size = Size(parameterBoxWidth, parameterBoxHeight)
         self.functionalClassBox2.DropDown += self.get_field_functional_class2
 
-        self.capacityLabel = Label()
-        self.capacityLabel.Text = "Capacity Field"
-        self.capacityLabel.Location = Point(10, 420)
-        self.capacityLabel.Size = Size(parameterLabelWidth, parameterLabelHeight)
-
-        self.capacityBox = ComboBox()
-        self.capacityBox.Location = Point(100, 420)
-        self.capacityBox.Size = Size(parameterBoxWidth, parameterBoxHeight)
-        self.capacityBox.DropDown += self.get_field_capacity
-
-        self.capacityLabel2 = Label()
-        self.capacityLabel2.Text = "Capacity Field"
-        self.capacityLabel2.Location = Point(10, 440)
-        self.capacityLabel2.Size = Size(parameterLabelWidth, parameterLabelHeight)
-
-        self.capacityBox2 = ComboBox()
-        self.capacityBox2.Location = Point(100, 440)
-        self.capacityBox2.Size = Size(parameterBoxWidth, parameterBoxHeight)
-        self.capacityBox2.DropDown += self.get_field_capacity2
-
         self.matrixFileLabel = Label()
         self.matrixFileLabel.Text = "Autos Table"
         self.matrixFileLabel.Location = Point(10, 480)
@@ -355,10 +335,6 @@ class SmartDTA(Form):
         self.Controls.Add(self.functionalClassBox)
         self.Controls.Add(self.functionalClassLabel2)
         self.Controls.Add(self.functionalClassBox2)
-        self.Controls.Add(self.capacityLabel)
-        self.Controls.Add(self.capacityBox)
-        self.Controls.Add(self.capacityLabel2)
-        self.Controls.Add(self.capacityBox2)
         self.Controls.Add(self.matrixFileLabel)
         self.Controls.Add(self.matrixFileBox)
         self.Controls.Add(self.select_Mdirectory)
@@ -406,8 +382,6 @@ class SmartDTA(Form):
                 + "Lanes2 nvarchar(40), "
                 + "Functional_Class nvarchar(40), "
                 + "Functional_Class2 nvarchar(40), "
-                + "Capacity nvarchar(40), "
-                + "Capacity2 nvarchar(40), "
                 + "Matrix_File nvarchar(100), "
                 + "Matrix_Core nvarchar(40), "
                 + "Direction nvarchar(40), "
@@ -505,7 +479,7 @@ class SmartDTA(Form):
             self.select_Pname.Items.Add(rdr.GetString(0))
 
     def update_database(self, cn, text, field):
-        if self.previousValue == "null":
+        if self.previousValue == "null" and text != None and text != '':
             self.previousValue = self.listBox.SelectedItem  #if there was no previous item, it was the current one.
         sql = (
             "update TimePeriods set " + field + "='" + text
@@ -563,8 +537,6 @@ class SmartDTA(Form):
         self.update_database(cn, self.laneBox2.Text, "Lanes2")
         self.update_database(cn, self.functionalClassBox.Text, "Functional_Class")
         self.update_database(cn, self.functionalClassBox2.Text, "Functional_Class2")
-        self.update_database(cn, self.capacityBox.Text, "Capacity")
-        self.update_database(cn, self.capacityBox2.Text, "Capacity2")
         self.update_database(cn, self.matrixFileBox.Text, "Matrix_File")
         self.update_database(cn, self.coreBox.Text, "Matrix_Core")
         self.update_database(cn, self.truckFileBox.Text, "Trucks_File")
@@ -593,8 +565,6 @@ class SmartDTA(Form):
         self.laneBox2.Text = self.update_box(cn, self.laneBox2.Text, "Lanes2")
         self.functionalClassBox.Text = self.update_box(cn, self.functionalClassBox.Text, "Functional_Class")
         self.functionalClassBox2.Text = self.update_box(cn, self.functionalClassBox2.Text, "Functional_Class2")
-        self.capacityBox.Text = self.update_box(cn, self.capacityBox.Text, "Capacity")
-        self.capacityBox2.Text = self.update_box(cn, self.capacityBox2.Text, "Capacity2")
         self.matrixFileBox.Text = self.update_box(cn, self.matrixFileBox.Text, "Matrix_File")
         self.coreBox.Text = self.update_box(cn, self.coreBox.Text, "Matrix_Core")
         self.truckFileBox.Text = self.update_box(cn, self.truckFileBox.Text, "Trucks_File")
@@ -640,16 +610,13 @@ class SmartDTA(Form):
     	self.speedLabel2.Visible=value
     	self.laneLabel2.Visible=value
     	self.functionalClassLabel2.Visible=value
-    	self.capacityLabel2.Visible=value
     	self.speedBox2.Visible=value
     	self.laneBox2.Visible=value
     	self.functionalClassBox2.Visible=value
-    	self.capacityBox2.Visible=value
     	if(value == False):
     		self.speedBox2.ResetText()
     		self.laneBox2.ResetText()
     		self.functionalClassBox2.ResetText()
-    		self.capacityBox2.ResetText()
 
     def get_core_names(self, sender, args):
     	matrix_name = self.matrixFileBox.Text
@@ -750,22 +717,6 @@ class SmartDTA(Form):
     	for item in tokens:
     		self.functionalClassBox2.Items.Add(item)
 
-    def get_field_capacity(self, sender, args):
-    	tokens = self.get_field()
-
-    	self.capacityBox.Items.Clear()
-        
-    	for item in tokens:
-    		self.capacityBox.Items.Add(item)
-
-    def get_field_capacity2(self, sender, args):
-    	tokens = self.get_field()
-
-    	self.capacityBox2.Items.Clear()
-        
-    	for item in tokens:
-    		self.capacityBox2.Items.Add(item)
-
     def check_time_period_folder(self, item):
     	if self.select_Pname.Text != None and item != None:
     		directory = self.select_Pname.Text + "\\" + item
@@ -860,8 +811,8 @@ class SmartDTA(Form):
     	cn = SqlCeConnection(self.connectionString)
     	cn.Open()
     	row1 = "name,link_id,from_node_id,to_node_id,link_type_name,direction,length,number_of_lanes,speed_limit_in_mph,saturation_flow_rate_in_vhc_per_hour_per_lane,lane_capacity_in_vhc_per_hour,link_type,jam_density_in_vhc_pmpl,wave_speed_in_mph,effective_green_time_length_in_second,green_start_time_in_second,AADT_conversion_factor,mode_code,grade,geometry"
-    	row2 = ",ID,From_Node,To_Node,,Dir,Length,"+self.query(cn, item, "Lanes")+","+self.query(cn, item, "Speed")+",,"+self.query(cn, item, "Capacity")+","+self.query(cn, item, "Functional_Class")+",,,,,,,,x"
-    	row3 = ",,,,,,,"+self.query(cn, item, "Lanes2")+","+self.query(cn, item, "Speed2")+",,"+self.query(cn, item, "Capacity2")+","+self.query(cn, item, "Functional_Class2")+",,,,,,,,x"
+    	row2 = ",ID,From_Node,To_Node,,Dir,Length,"+self.query(cn, item, "Lanes")+","+self.query(cn, item, "Speed")+",,,"+self.query(cn, item, "Functional_Class")+",,,,,,,,x"
+    	row3 = ",,,,,,,"+self.query(cn, item, "Lanes2")+","+self.query(cn, item, "Speed2")+",,,"+self.query(cn, item, "Functional_Class2")+",,,,,,,,x"
 
     	self.check_time_period_folder(item)
 
@@ -900,7 +851,7 @@ class SmartDTA(Form):
 
 
     def generate_input_files(self, target_directory, trips_file):
-    	activity_location = "input_activity_location.csv"
+    	activity_location = "input_activity_location.csv"  #TODO: Don't write this file
     	zone = "input_zone.csv"
     	zone_ids = []
 

@@ -142,7 +142,9 @@ public class Write_Load_to_TransCAD {
             for (p = 0; p < periods.length; p++) { // periods
                 
                 //System.out.println(periods[p]);
-                //System.out.println(phf[p]);
+                if(phf[p].equals("")) {
+                    System.out.println("missing phf");
+                }
                 pathIn = basePath + periods[p] + "/";
                 inTCLinksFile = pathIn + "links.csv";
                 String inLinksFile = pathIn + "output_LinkTDMOE.csv";

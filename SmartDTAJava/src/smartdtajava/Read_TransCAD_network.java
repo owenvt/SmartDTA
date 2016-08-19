@@ -43,12 +43,19 @@ public class Read_TransCAD_network {
             int iSpeed, iCap, num;
             double dSpeed, dCap;
             
-            int iType = Integer.parseInt(inFields[linkDex[LINK_TYPE]]);
-            int iLanes = Integer.parseInt(inFields[linkDex[NUMBER_OF_LANES]]);
-            int dLanes = Integer.parseInt(inFields[linkDex[NUMBER_OF_LANES]]);
+            int iType = 0;
+            int iLanes = 0;
+            try {
+                iType = Integer.parseInt(inFields[linkDex[LINK_TYPE]]);
+                iLanes = Integer.parseInt(inFields[linkDex[NUMBER_OF_LANES]]);
+                int dLanes = Integer.parseInt(inFields[linkDex[NUMBER_OF_LANES]]);
                             
-            if (isCC[Integer.parseInt(inFields[linkDex[LINK_TYPE]])] == 1) {
-                iLanes = 9; // centroid connectors
+                if (isCC[Integer.parseInt(inFields[linkDex[LINK_TYPE]])] == 1) {
+                    iLanes = 9; // centroid connectors
+                }
+            } catch(Exception e) {
+                System.out.println("Error on line id: " + (inFields[linkDex[LINK_ID]]));
+                System.exit(1);
             }
             String outString = ",";
             //outString += inFields[linkDex[LINK_ID]]; // Link ID
@@ -111,8 +118,8 @@ public class Read_TransCAD_network {
 
     public static void main(String[] args) {
         
-        int[] dCaps = new int[20];
-        int[] isCC = new int[20];
+        int[] dCaps = new int[40];
+        int[] isCC = new int[40];
         
         String basePath = args[0];
         String pathIn = basePath;
