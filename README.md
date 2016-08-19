@@ -6,7 +6,11 @@ Save all files to a folder on your computer.  In addition to SmartDTA, you will 
 
 TransCAD version 6
 
-Java
+The following free tools:
+
+Java https://java.com/en/download/
+
+Visual Studio 2015  https://www.visualstudio.com/
 
 NEXTA DTALite which is free and can be downloaded at https://github.com/xzhou99/dtalite_software_release
 
@@ -17,7 +21,9 @@ Unzip the folder in your desired directory.
 
 Find the file "input_link_type.csv" in the "Shared" folder.  This file will be copied to each of your time period folders, so modify it to match the link types to the numbers specified in your model documentation.  This file may be modified in each of the time period folders as well, once they are created.
 
-Run SmartDTA.py with IronPython.
+Open Command Prompt and navigate to SmartDTA folder.
+
+Run SmartDTA.py with IronPython by entering "ipy SmartDTA.py".
 
 Browse to select your project folder.  This is the base directory that contains your time period folders.
 
@@ -41,4 +47,4 @@ If there is a problem on any step, go back and make sure all prior boxes are sel
 
 If there is an issue with "smartdta.dbd" try recompiling it.  It is simply a compiled version of "export network.rsc" which is included.
 
-SmartDTA.jar is the compiled java source code which is inlcuded.  It is used for converting csvs back and forth between TransCAD and DTALite formats.
+SmartDTA.jar is the compiled java source code which is included.  It is used for converting csvs back and forth between TransCAD and DTALite formats.
